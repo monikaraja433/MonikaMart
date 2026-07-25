@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  monikamart-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: monikamart-production
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DB_URL=jdbc:h2:/usr/local/tomcat/data/monikamart;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_UPPER=false
+      - DB_USER=sa
+      - DB_PASSWORD=
+      - AI_CHATBOT_PROVIDER=mock
+    volumes:
+      # Persistent H2 file storage across container restarts (Week 8 deploy requirement)
+      - ./data:/usr/local/tomcat/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

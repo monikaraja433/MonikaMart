@@ -1,0 +1,25 @@
+target/
+*.war
+*.jar
+*.class
+
+# Configuration & Secrets
+config.properties
+.env
+*.env
+*.log
+
+# IDE & OS
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.DS_Store
+Thumbs.db
+
+# Embedded DB files
+*.mv.db
+*.trace.db
+data/
