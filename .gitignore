@@ -1,25 +1,9 @@
-target/
-*.war
-*.jar
-*.class
-
-# Configuration & Secrets
-config.properties
-.env
-*.env
+﻿target/
+temp-tomcat/
 *.log
-
-# IDE & OS
-.idea/
-*.iml
-.vscode/
-.settings/
-.project
-.classpath
-.DS_Store
-Thumbs.db
-
-# Embedded DB files
-*.mv.db
-*.trace.db
 data/
+.idea/
+.vscode/
+.classpath
+.project
+.settings/
