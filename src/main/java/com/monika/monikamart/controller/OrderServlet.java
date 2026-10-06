@@ -1,5 +1,6 @@
 package com.monika.monikamart.controller;
 
+import com.monika.monikamart.dao.impl.ActivityDAOImpl;
 import com.monika.monikamart.dao.impl.CartDAOImpl;
 import com.monika.monikamart.dao.impl.OrderDAOImpl;
 import com.monika.monikamart.dao.impl.ProductDAOImpl;
@@ -8,6 +9,7 @@ import com.monika.monikamart.dto.UserResponseDTO;
 import com.monika.monikamart.exception.ValidationException;
 import com.monika.monikamart.model.CartItem;
 import com.monika.monikamart.model.Order;
+import com.monika.monikamart.service.ActivityService;
 import com.monika.monikamart.service.CartService;
 import com.monika.monikamart.service.OrderService;
 import com.monika.monikamart.service.UserService;
@@ -26,6 +28,7 @@ public class OrderServlet extends HttpServlet {
     private OrderService orderService;
     private CartService cartService;
     private UserService userService;
+    private ActivityService activityService;
 
     @Override
     public void init() {
@@ -37,6 +40,7 @@ public class OrderServlet extends HttpServlet {
         this.orderService = new OrderService(orderDAO, cartDAO, productDAO);
         this.cartService = new CartService(cartDAO, productDAO);
         this.userService = new UserService(userDAO);
+        this.activityService = new ActivityService(new ActivityDAOImpl());
     }
 
     @Override
@@ -91,6 +95,12 @@ public class OrderServlet extends HttpServlet {
 
             try {
                 Order order = orderService.checkout(user.getId(), address, paymentMethod);
+
+                // Audit log for Admin notification: Order placed (Never logs payment credentials)
+                activityService.logActivity("ORDER_PLACED", "Order placed: #MKM-" + order.getId() + " by " + user.getName() + " (" + user.getEmail() + ") - Total: ₹" + order.getTotalAmount(), user.getEmail());
+
+                // Set exact required success flash message
+                session.setAttribute("flashSuccess", "Order placed successfully!");
                 resp.sendRedirect(req.getContextPath() + "/order-detail?id=" + order.getId() + "&success=OrderPlaced");
             } catch (ValidationException e) {
                 List<CartItem> cartItems = cartService.getCartForUser(user.getId());

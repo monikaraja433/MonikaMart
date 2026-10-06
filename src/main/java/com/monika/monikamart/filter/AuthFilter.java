@@ -49,7 +49,8 @@ public class AuthFilter implements Filter {
 
         // Role-based authorization checks
         if (relativePath.startsWith("/admin")) {
-            if (currentUser.getRole() != Role.ADMIN) {
+            String allowedAdminEmail = com.monika.monikamart.util.DBUtil.getProperty("admin.email", "monikaraja433@gmail.com").trim().toLowerCase();
+            if (currentUser.getRole() != Role.ADMIN || !currentUser.getEmail().equalsIgnoreCase(allowedAdminEmail)) {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied: Admin privileges required.");
                 return;
             }

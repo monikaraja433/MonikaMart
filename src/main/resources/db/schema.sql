@@ -107,3 +107,16 @@ CREATE TABLE IF NOT EXISTS wishlist_items (
 );
 
 CREATE INDEX IF NOT EXISTS idx_wishlist_user ON wishlist_items(user_id);
+
+-- System Audit and Admin Notifications (Activity Logging)
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    activity_type VARCHAR(50) NOT NULL,
+    description VARCHAR(500) NOT NULL,
+    user_email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created ON activity_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_type ON activity_logs(activity_type);
+

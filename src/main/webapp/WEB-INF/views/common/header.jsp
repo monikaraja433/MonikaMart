@@ -83,3 +83,15 @@
     </header>
 
     <main class="main-content container">
+        <c:if test="${not empty sessionScope.flashSuccess}">
+            <div class="alert alert-success" style="margin-bottom: 24px;">
+                <c:out value="${sessionScope.flashSuccess}" />
+            </div>
+            <c:remove var="flashSuccess" scope="session" />
+        </c:if>
+        <c:if test="${not empty sessionScope.flashError}">
+            <div class="alert alert-danger" style="margin-bottom: 24px;">
+                <c:out value="${sessionScope.flashError}" />
+            </div>
+            <c:remove var="flashError" scope="session" />
+        </c:if>

@@ -15,10 +15,10 @@
     </div>
 </div>
 
-<c:if test="${param.success == 'ProductSaved'}">
+<c:if test="${param.success == 'ProductSaved' && empty sessionScope.flashSuccess}">
     <div class="alert alert-success">Product listing saved successfully.</div>
 </c:if>
-<c:if test="${param.success == 'ProductDeleted'}">
+<c:if test="${param.success == 'ProductDeleted' && empty sessionScope.flashSuccess}">
     <div class="alert alert-success">Product listing removed successfully.</div>
 </c:if>
 

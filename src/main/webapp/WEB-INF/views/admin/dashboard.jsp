@@ -35,6 +35,90 @@
     </div>
 </div>
 
+<!-- Live System Activity & Notifications (Admin Notification Audit Section) -->
+<div style="margin-bottom: 36px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin: 0;">
+            🔔 Live Activity & Notifications
+        </h3>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Audit log showing user/seller logins, registrations, product changes, orders, and reviews</span>
+    </div>
+
+    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden;">
+        <c:choose>
+            <c:when test="${empty recentActivities}">
+                <div style="padding: 30px; text-align: center; color: var(--text-muted);">
+                    No activities recorded yet.
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="table-responsive">
+                    <table class="table" style="margin-bottom: 0;">
+                        <thead>
+                            <tr style="background: #f8fafc;">
+                                <th style="width: 130px;">Event</th>
+                                <th>Activity Description</th>
+                                <th style="width: 230px;">User / Initiator</th>
+                                <th style="width: 220px;">Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="act" items="${recentActivities}">
+                                <tr>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${act.activityType == 'LOGIN'}">
+                                                <span class="badge badge-info">🔑 LOGIN</span>
+                                            </c:when>
+                                            <c:when test="${act.activityType == 'REGISTRATION'}">
+                                                <span class="badge badge-primary">✨ REGISTER</span>
+                                            </c:when>
+                                            <c:when test="${act.activityType == 'PRODUCT_ADDED'}">
+                                                <span class="badge badge-success">📦 PROD ADD</span>
+                                            </c:when>
+                                            <c:when test="${act.activityType == 'PRODUCT_UPDATED'}">
+                                                <span class="badge badge-warning">✏️ PROD EDIT</span>
+                                            </c:when>
+                                            <c:when test="${act.activityType == 'PRODUCT_DELETED'}">
+                                                <span class="badge badge-danger">🗑️ PROD DEL</span>
+                                            </c:when>
+                                            <c:when test="${act.activityType == 'ORDER_PLACED'}">
+                                                <span class="badge badge-success">🛒 ORDER</span>
+                                            </c:when>
+                                            <c:when test="${act.activityType == 'REVIEW_SUBMITTED'}">
+                                                <span class="badge badge-secondary">⭐ REVIEW</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge badge-primary"><c:out value="${act.activityType}" /></span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td style="font-weight: 500; color: #1e293b;">
+                                        <c:out value="${act.description}" />
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty act.userEmail}">
+                                                <span style="font-size: 0.85rem; color: var(--text-muted);"><c:out value="${act.userEmail}" /></span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span style="font-size: 0.85rem; color: var(--text-muted);">System</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+                                        <fmt:formatDate value="${act.createdAt}" pattern="dd MMM yyyy, hh:mm:ss a" />
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+</div>
+
 <!-- Recent Orders Across Entire Platform -->
 <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Recent System Transactions</h3>
 

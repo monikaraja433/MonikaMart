@@ -19,8 +19,8 @@
     <a href="${pageContext.request.contextPath}/orders" class="btn btn-secondary btn-sm">&larr; Back to Orders</a>
 </div>
 
-<c:if test="${param.success == 'OrderPlaced'}">
-    <div class="alert alert-success">🎉 Thank you! Your order was placed successfully and is being prepared.</div>
+<c:if test="${param.success == 'OrderPlaced' && empty sessionScope.flashSuccess}">
+    <div class="alert alert-success">Order placed successfully!</div>
 </c:if>
 <c:if test="${param.reviewSuccess == 'true'}">
     <div class="alert alert-success">⭐ Thank you for your review! It has been published on the product page.</div>

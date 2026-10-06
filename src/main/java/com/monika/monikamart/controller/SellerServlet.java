@@ -1,5 +1,6 @@
 package com.monika.monikamart.controller;
 
+import com.monika.monikamart.dao.impl.ActivityDAOImpl;
 import com.monika.monikamart.dao.impl.CartDAOImpl;
 import com.monika.monikamart.dao.impl.OrderDAOImpl;
 import com.monika.monikamart.dao.impl.ProductDAOImpl;
@@ -9,6 +10,7 @@ import com.monika.monikamart.exception.ValidationException;
 import com.monika.monikamart.model.Order;
 import com.monika.monikamart.model.OrderStatus;
 import com.monika.monikamart.model.Product;
+import com.monika.monikamart.service.ActivityService;
 import com.monika.monikamart.service.OrderService;
 import com.monika.monikamart.service.ProductService;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import javax.servlet.http.HttpSession;
 public class SellerServlet extends HttpServlet {
     private ProductService productService;
     private OrderService orderService;
+    private ActivityService activityService;
 
     @Override
     public void init() {
@@ -41,6 +44,7 @@ public class SellerServlet extends HttpServlet {
         CartDAOImpl cartDAO = new CartDAOImpl();
         this.productService = new ProductService(productDAO);
         this.orderService = new OrderService(orderDAO, cartDAO, productDAO);
+        this.activityService = new ActivityService(new ActivityDAOImpl());
     }
 
     @Override
@@ -117,9 +121,13 @@ public class SellerServlet extends HttpServlet {
 
             try {
                 if (dto.getId() != null) {
-                    productService.updateProduct(dto, seller.getId());
+                    Product updated = productService.updateProduct(dto, seller.getId());
+                    activityService.logActivity("PRODUCT_UPDATED", "Product updated: '" + dto.getName() + "' (ID: #" + dto.getId() + ") by " + seller.getName() + " (" + seller.getEmail() + ")", seller.getEmail());
+                    session.setAttribute("flashSuccess", "Product updated successfully!");
                 } else {
-                    productService.createProduct(dto, seller.getId());
+                    Product created = productService.createProduct(dto, seller.getId());
+                    activityService.logActivity("PRODUCT_ADDED", "Product added: '" + created.getName() + "' by " + seller.getName() + " (" + seller.getEmail() + ") - Price: ₹" + created.getPrice(), seller.getEmail());
+                    session.setAttribute("flashSuccess", "Product added successfully!");
                 }
                 resp.sendRedirect(req.getContextPath() + "/seller/dashboard?success=ProductSaved");
             } catch (ValidationException e) {
@@ -131,8 +139,15 @@ public class SellerServlet extends HttpServlet {
             }
         } else if ("/seller/product-delete".equals(path)) {
             int productId = Integer.parseInt(req.getParameter("productId"));
-            productService.deleteProduct(productId, seller.getId());
-            resp.sendRedirect(req.getContextPath() + "/seller/dashboard?success=ProductDeleted");
+            try {
+                productService.deleteProduct(productId, seller.getId());
+                activityService.logActivity("PRODUCT_DELETED", "Product deleted: ID #" + productId + " by " + seller.getName() + " (" + seller.getEmail() + ")", seller.getEmail());
+                session.setAttribute("flashSuccess", "Product deleted successfully!");
+                resp.sendRedirect(req.getContextPath() + "/seller/dashboard?success=ProductDeleted");
+            } catch (Exception e) {
+                session.setAttribute("flashError", "Failed to delete product: " + e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
+            }
         } else if ("/seller/status-update".equals(path)) {
             int orderId = Integer.parseInt(req.getParameter("orderId"));
             String statusStr = req.getParameter("newStatus");
@@ -141,9 +156,15 @@ public class SellerServlet extends HttpServlet {
 
             try {
                 orderService.updateOrderStatus(orderId, newStatus, notes, seller.getId(), seller.getRole());
+                activityService.logActivity("ORDER_STATUS", "Order #MKM-" + orderId + " status updated to " + newStatus + " by " + seller.getEmail(), seller.getEmail());
+                session.setAttribute("flashSuccess", "Order status updated successfully!");
                 resp.sendRedirect(req.getContextPath() + "/seller/orders?success=StatusUpdated");
             } catch (ValidationException e) {
+                session.setAttribute("flashError", e.getMessage());
                 resp.sendRedirect(req.getContextPath() + "/seller/orders?error=" + e.getMessage());
+            } catch (Exception e) {
+                session.setAttribute("flashError", "Failed to update order status: " + e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/seller/orders?error=StatusUpdateFailed");
             }
         }
     }

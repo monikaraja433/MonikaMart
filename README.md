@@ -153,15 +153,11 @@ Access the application at [http://localhost:8080/products](http://localhost:8080
 
 ---
 
-## 🔑 Demo Seed Accounts (One-Click Auto-Fill)
+## 🔐 Admin & Role Configuration
 
-The database automatically initializes schema and demo accounts on first launch:
-
-| Role | Email | Password | Intended Capabilities |
-| :--- | :--- | :--- | :--- |
-| **Buyer** | `buyer1@monikamart.com` | `Buyer@123` | Browse catalog, manage cart, place orders, review products |
-| **Seller** | `seller1@monikamart.com` | `Seller@123` | Merchant hub, create listings, fulfill incoming orders |
-| **Admin** | `admin@monikamart.com` | `Admin@123` | Platform oversight, user registry, listing moderation |
+- **Admin Account:** `monikaraja433@gmail.com` (`Monika Raja`)
+- **Admin Password Security:** Configured strictly via the `ADMIN_PASSWORD` environment variable (`System.getenv("ADMIN_PASSWORD")`). Never hardcoded in source or configuration files.
+- **Buyer & Seller Accounts:** Users can register as Buyers or Sellers via `/register` and sign in via `/login`.
 
 ---
 

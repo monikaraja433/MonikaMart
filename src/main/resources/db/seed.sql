@@ -1,10 +1,6 @@
--- MonikaMart Demo Seed Data
--- Demo User accounts are initialized in DBUtil with live BCrypt hashing:
--- admin@monikamart.com -> Admin@123 (Role: ADMIN)
--- seller1@monikamart.com -> Seller@123 (Role: SELLER)
--- seller2@monikamart.com -> Seller@123 (Role: SELLER)
--- buyer1@monikamart.com -> Buyer@123 (Role: BUYER)
--- buyer2@monikamart.com -> Buyer@123 (Role: BUYER)
+-- MonikaMart Initial Seed Data
+-- User accounts are initialized in DBUtil with BCrypt password hashing.
+-- Admin password is read strictly from the ADMIN_PASSWORD environment variable.
 
 INSERT INTO products (id, seller_id, name, description, price, stock_qty, category, image_url, is_active) VALUES
 (1, 2, 'Sony WH-1000XM5 Wireless Headphones', 'Industry Leading Noise Canceling with 2 processors and 8 microphones. Up to 30-hour battery life and ultra-comfortable lightweight design.', 29999.00, 25, 'Electronics', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600', TRUE),

@@ -33,24 +33,6 @@
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
     </form>
 
-    <!-- Quick Demo Logins for Faculty & Reviewers -->
-    <div style="margin-top: 28px; padding-top: 20px; border-top: 1px dashed var(--border-color);">
-        <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">
-            Demo Accounts (One-Click Auto-Fill):
-        </p>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="fillCredentials('buyer1@monikamart.com', 'Buyer@123')">
-                🛒 Buyer: buyer1@monikamart.com (Monika)
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="fillCredentials('seller1@monikamart.com', 'Seller@123')">
-                🏪 Seller: seller1@monikamart.com (Aditya Electronics)
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="fillCredentials('admin@monikamart.com', 'Admin@123')">
-                ⚙️ Admin: admin@monikamart.com (System Admin)
-            </button>
-        </div>
-    </div>
-
     <div style="margin-top: 24px; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
         Don't have an account? <a href="${pageContext.request.contextPath}/register">Create one here</a>
     </div>

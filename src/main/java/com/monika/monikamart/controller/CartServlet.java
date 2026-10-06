@@ -61,23 +61,27 @@ public class CartServlet extends HttpServlet {
                 String isAjax = req.getHeader("X-Requested-With");
                 if ("XMLHttpRequest".equalsIgnoreCase(isAjax)) {
                     resp.setContentType("application/json");
-                    JsonUtil.writeJson(resp.getWriter(), ApiResponse.success(cartService.getCartCount(user.getId()), "Item added to cart"));
+                    JsonUtil.writeJson(resp.getWriter(), ApiResponse.success(cartService.getCartCount(user.getId()), "Product added to cart successfully!"));
                     return;
                 }
 
+                session.setAttribute("flashSuccess", "Product added to cart successfully!");
                 resp.sendRedirect(req.getContextPath() + "/cart?added=true");
             } else if ("/cart/update".equals(path)) {
                 int cartItemId = Integer.parseInt(req.getParameter("cartItemId"));
                 int quantity = Integer.parseInt(req.getParameter("quantity"));
 
                 cartService.updateQuantity(cartItemId, user.getId(), quantity);
+                session.setAttribute("flashSuccess", "Cart updated successfully!");
                 resp.sendRedirect(req.getContextPath() + "/cart");
             } else if ("/cart/remove".equals(path)) {
                 int cartItemId = Integer.parseInt(req.getParameter("cartItemId"));
                 cartService.removeItem(cartItemId, user.getId());
+                session.setAttribute("flashSuccess", "Item removed from cart successfully!");
                 resp.sendRedirect(req.getContextPath() + "/cart");
             } else if ("/cart/clear".equals(path)) {
                 cartService.clearCart(user.getId());
+                session.setAttribute("flashSuccess", "Cart cleared successfully!");
                 resp.sendRedirect(req.getContextPath() + "/cart");
             }
         } catch (ValidationException e) {
@@ -88,9 +92,10 @@ public class CartServlet extends HttpServlet {
                 JsonUtil.writeJson(resp.getWriter(), ApiResponse.error(e.getMessage()));
                 return;
             }
-            req.getSession().setAttribute("cartError", e.getMessage());
+            session.setAttribute("flashError", e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/cart");
         } catch (Exception e) {
+            session.setAttribute("flashError", "Cart operation failed: " + e.getMessage());
             resp.sendRedirect(req.getContextPath() + "/cart?error=ActionFailed");
         }
     }

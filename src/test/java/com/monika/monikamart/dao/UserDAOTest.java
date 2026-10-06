@@ -39,7 +39,7 @@ public class UserDAOTest extends BaseDAOTest {
 
     @Test
     public void testExistsByEmail() {
-        Assertions.assertTrue(userDAO.existsByEmail("admin@monikamart.com"), "Seeded admin email should exist");
+        Assertions.assertTrue(userDAO.existsByEmail("monikaraja433@gmail.com"), "Seeded admin email should exist");
         Assertions.assertFalse(userDAO.existsByEmail("nonexistent_" + System.currentTimeMillis() + "@gmail.com"));
     }
 

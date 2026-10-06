@@ -6,6 +6,10 @@
 
 <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--dark); margin-bottom: 24px;">Shopping Cart</h1>
 
+<c:if test="${param.added == 'true' && empty sessionScope.flashSuccess}">
+    <div class="alert alert-success">Product added to cart successfully!</div>
+</c:if>
+
 <c:if test="${not empty sessionScope.cartError}">
     <div class="alert alert-danger"><c:out value="${sessionScope.cartError}" /></div>
     <c:remove var="cartError" scope="session" />

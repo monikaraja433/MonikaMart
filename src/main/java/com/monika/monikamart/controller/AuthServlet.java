@@ -1,11 +1,13 @@
 package com.monika.monikamart.controller;
 
+import com.monika.monikamart.dao.impl.ActivityDAOImpl;
 import com.monika.monikamart.dao.impl.UserDAOImpl;
 import com.monika.monikamart.dto.UserRegistrationDTO;
 import com.monika.monikamart.dto.UserResponseDTO;
 import com.monika.monikamart.exception.AuthenticationException;
 import com.monika.monikamart.exception.ValidationException;
 import com.monika.monikamart.model.Role;
+import com.monika.monikamart.service.ActivityService;
 import com.monika.monikamart.service.UserService;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -18,10 +20,12 @@ import javax.servlet.http.HttpSession;
 @WebServlet(urlPatterns = {"/login", "/register", "/logout"})
 public class AuthServlet extends HttpServlet {
     private UserService userService;
+    private ActivityService activityService;
 
     @Override
     public void init() {
         this.userService = new UserService(new UserDAOImpl());
+        this.activityService = new ActivityService(new ActivityDAOImpl());
     }
 
     @Override
@@ -66,6 +70,9 @@ public class AuthServlet extends HttpServlet {
         try {
             UserResponseDTO user = userService.authenticate(email, password);
 
+            // Audit log for Admin notification: User/Seller/Admin login (Never logs password or sensitive data)
+            activityService.logActivity("LOGIN", user.getRole() + " login: " + user.getName() + " (" + user.getEmail() + ")", user.getEmail());
+
             // Session Fixation Prevention: Invalidate existing session and regenerate session ID
             HttpSession oldSession = req.getSession(false);
             if (oldSession != null) {
@@ -74,6 +81,7 @@ public class AuthServlet extends HttpServlet {
             HttpSession newSession = req.getSession(true);
             newSession.setMaxInactiveInterval(30 * 60); // 30 minutes explicit timeout
             newSession.setAttribute("user", user);
+            newSession.setAttribute("flashSuccess", "Signed in successfully! Welcome back, " + user.getName() + ".");
 
             if (redirect != null && !redirect.trim().isEmpty() && !redirect.contains("login") && !redirect.contains("register")) {
                 resp.sendRedirect(redirect);
@@ -111,10 +119,14 @@ public class AuthServlet extends HttpServlet {
         try {
             UserResponseDTO newUser = userService.register(dto);
 
+            // Audit log for Admin notification: New user registration (Never logs password or sensitive data)
+            activityService.logActivity("REGISTRATION", "New " + newUser.getRole() + " registered: " + newUser.getName() + " (" + newUser.getEmail() + ")", newUser.getEmail());
+
             // Automatically log in newly registered user
             HttpSession newSession = req.getSession(true);
             newSession.setMaxInactiveInterval(30 * 60);
             newSession.setAttribute("user", newUser);
+            newSession.setAttribute("flashSuccess", "Account registered successfully! Welcome to MonikaMart.");
 
             if (newUser.getRole() == Role.SELLER) {
                 resp.sendRedirect(req.getContextPath() + "/seller/dashboard");

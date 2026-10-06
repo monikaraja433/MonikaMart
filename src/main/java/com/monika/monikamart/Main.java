@@ -40,12 +40,9 @@ public class Main {
         System.out.println("==================================================================");
         System.out.println(" 🛒 MonikaMart E-Commerce Platform is Starting...");
         System.out.println(" 🌐 Catalog URL:    http://localhost:" + port + "/products");
+        System.out.println(" 🔐 Login URL:      http://localhost:" + port + "/login");
         System.out.println(" 🏥 Health Check:   http://localhost:" + port + "/api/v1/health");
         System.out.println(" 🤖 AI Chatbot:     Integrated Floating Widget on all pages");
-        System.out.println(" 👥 Demo Logins:    Available on http://localhost:" + port + "/login");
-        System.out.println("    - Buyer:  buyer1@monikamart.com / Buyer@123");
-        System.out.println("    - Seller: seller1@monikamart.com / Seller@123");
-        System.out.println("    - Admin:  admin@monikamart.com / Admin@123");
         System.out.println("==================================================================");
 
         tomcat.start();

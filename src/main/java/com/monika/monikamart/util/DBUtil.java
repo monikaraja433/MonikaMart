@@ -119,6 +119,7 @@ public class DBUtil {
             executeSqlScript(conn, "db/schema.sql");
             executeSqlScript(conn, "db/migration/V2__order_status_workflow.sql");
             seedInitialDataIfEmpty(conn);
+            ensureSingleAdminAccount(conn);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error applying schema or seed scripts", e);
         }
@@ -161,6 +162,85 @@ public class DBUtil {
         }
     }
 
+    public static void ensureSingleAdminAccount(Connection conn) {
+        String adminEmail = getProp("admin.email", "ADMIN_EMAIL", "monikaraja433@gmail.com").trim().toLowerCase();
+        String adminName = getProp("admin.name", "ADMIN_NAME", "Monika Raja").trim();
+        String adminPassword = System.getenv("ADMIN_PASSWORD");
+
+        try {
+            // 1. Remove old default admin account if different email
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE LOWER(email) = 'admin@monikamart.com'")) {
+                ps.executeUpdate();
+            }
+
+            // 2. Ensure NO other email has ADMIN role
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET role = 'BUYER' WHERE role = 'ADMIN' AND LOWER(email) <> ?")) {
+                ps.setString(1, adminEmail);
+                ps.executeUpdate();
+            }
+
+            // 3. Ensure the single designated admin account exists and is valid
+            boolean adminExists = false;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM users WHERE LOWER(email) = ?")) {
+                ps.setString(1, adminEmail);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        adminExists = true;
+                    }
+                }
+            }
+
+            String adminHash = (adminPassword != null && !adminPassword.isEmpty())
+                    ? PasswordUtil.hashPassword(adminPassword)
+                    : "ENV_ADMIN_PASSWORD_NOT_SET";
+
+            if (adminExists) {
+                try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET name = ?, role = 'ADMIN', password_hash = ? WHERE LOWER(email) = ?")) {
+                    ps.setString(1, adminName);
+                    ps.setString(2, adminHash);
+                    ps.setString(3, adminEmail);
+                    ps.executeUpdate();
+                }
+            } else {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "INSERT INTO users (name, email, password_hash, role, phone, address) VALUES (?, ?, ?, 'ADMIN', ?, ?)")) {
+                    ps.setString(1, adminName);
+                    ps.setString(2, adminEmail);
+                    ps.setString(3, adminHash);
+                    ps.setString(4, "+91 9876543210");
+                    ps.setString(5, "Anna University Campus, Chennai, Tamil Nadu");
+                    ps.executeUpdate();
+                }
+            }
+
+            // 4. Ensure activity_logs table exists
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("CREATE TABLE IF NOT EXISTS activity_logs (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                        "activity_type VARCHAR(50) NOT NULL, " +
+                        "description VARCHAR(500) NOT NULL, " +
+                        "user_email VARCHAR(100), " +
+                        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+            }
+
+            // Seed initial activity if empty
+            try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM activity_logs");
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) == 0) {
+                    try (PreparedStatement insertAct = conn.prepareStatement(
+                            "INSERT INTO activity_logs (activity_type, description, user_email) VALUES (?, ?, ?)")) {
+                        insertAct.setString(1, "SYSTEM_INIT");
+                        insertAct.setString(2, "Platform initialized with secure Admin: " + adminName + " (" + adminEmail + ")");
+                        insertAct.setString(3, adminEmail);
+                        insertAct.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Notice during ensureSingleAdminAccount: " + e.getMessage(), e);
+        }
+    }
+
     private static void seedInitialDataIfEmpty(Connection conn) {
         try {
             boolean hasUsers = false;
@@ -173,17 +253,22 @@ public class DBUtil {
 
             if (!hasUsers) {
                 LOGGER.info("Users table is empty. Executing seed script and hashing passwords...");
-                // Insert default admin, sellers, buyers with fresh BCrypt hashes
-                String adminHash = PasswordUtil.hashPassword("Admin@123");
+                String adminEmail = getProp("admin.email", "ADMIN_EMAIL", "monikaraja433@gmail.com").trim().toLowerCase();
+                String adminName = getProp("admin.name", "ADMIN_NAME", "Monika Raja").trim();
+                String adminPassword = System.getenv("ADMIN_PASSWORD");
+
+                String adminHash = (adminPassword != null && !adminPassword.isEmpty())
+                        ? PasswordUtil.hashPassword(adminPassword)
+                        : "ENV_ADMIN_PASSWORD_NOT_SET";
                 String sellerHash = PasswordUtil.hashPassword("Seller@123");
                 String buyerHash = PasswordUtil.hashPassword("Buyer@123");
 
                 String insertUser = "INSERT INTO users (id, name, email, password_hash, role, phone, address) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(insertUser)) {
-                    // 1. Admin
+                    // 1. Designated Single Admin
                     ps.setInt(1, 1);
-                    ps.setString(2, "System Administrator");
-                    ps.setString(3, "admin@monikamart.com");
+                    ps.setString(2, adminName);
+                    ps.setString(3, adminEmail);
                     ps.setString(4, adminHash);
                     ps.setString(5, "ADMIN");
                     ps.setString(6, "+91 9876543210");

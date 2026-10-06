@@ -49,7 +49,12 @@ public class UserService {
             errors.put("confirmPassword", "Passwords do not match");
         }
 
-        // Enforce: Admin is a seed account only — no admin signup flow!
+        // Enforce: Admin is a designated single account only — no admin signup flow!
+        String allowedAdminEmail = com.monika.monikamart.util.DBUtil.getProperty("admin.email", "monikaraja433@gmail.com").trim().toLowerCase();
+        if (dto.getEmail() != null && dto.getEmail().trim().equalsIgnoreCase(allowedAdminEmail)) {
+            errors.put("email", "Admin account cannot be registered");
+        }
+
         Role requestedRole = dto.getRole();
         if (requestedRole == Role.ADMIN) {
             errors.put("role", "Admin accounts cannot be registered publicly");
@@ -88,8 +93,22 @@ public class UserService {
         }
 
         User user = userOpt.get();
-        if (!PasswordUtil.checkPassword(plainPassword, user.getPasswordHash())) {
-            throw new AuthenticationException("Invalid email or password");
+
+        // Security check: Only the designated single admin email can authenticate as ADMIN,
+        // and the Admin password must be read strictly from the ADMIN_PASSWORD environment variable.
+        if (user.getRole() == Role.ADMIN) {
+            String allowedAdminEmail = com.monika.monikamart.util.DBUtil.getProperty("admin.email", "monikaraja433@gmail.com").trim().toLowerCase();
+            if (!user.getEmail().equalsIgnoreCase(allowedAdminEmail)) {
+                throw new AuthenticationException("Unauthorized administrator account");
+            }
+            String envAdminPassword = System.getenv("ADMIN_PASSWORD");
+            if (envAdminPassword == null || envAdminPassword.isEmpty() || !plainPassword.equals(envAdminPassword)) {
+                throw new AuthenticationException("Invalid email or password");
+            }
+        } else {
+            if (!PasswordUtil.checkPassword(plainPassword, user.getPasswordHash())) {
+                throw new AuthenticationException("Invalid email or password");
+            }
         }
 
         return UserResponseDTO.fromUser(user);

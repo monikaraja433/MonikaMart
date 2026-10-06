@@ -4,7 +4,7 @@
 <c:set var="pageTitle" value="Product Catalog - MonikaMart" />
 <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
-<c:if test="${param.registered == 'true'}">
+<c:if test="${param.registered == 'true' && empty sessionScope.flashSuccess}">
     <div class="alert alert-success">Welcome to MonikaMart! Your account was registered successfully.</div>
 </c:if>
 
