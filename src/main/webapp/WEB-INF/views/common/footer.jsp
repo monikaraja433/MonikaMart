@@ -4,7 +4,7 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2026 <strong>MonikaMart</strong> &mdash; Anna University R2025, Semester 3 Capstone Project.</p>
-            <p style="margin-top: 6px; font-size: 0.8rem; color: #94a3b8;">
+            <p class="footer-subtext">
                 Built with Java Servlets &bull; JDBC &bull; HikariCP &bull; H2 Database &bull; Apache Tomcat 9.0.x &bull; AI Chatbot Engine
             </p>
         </div>

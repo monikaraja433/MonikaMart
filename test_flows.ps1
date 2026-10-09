@@ -37,8 +37,8 @@ if ($adminDash.Content -match "Live Activity & Notifications") {
 Write-Host "`n=== TEST 4: Security: Non-Admin Email CANNOT Login as Admin ==="
 $fakeAdminSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $fakeLoginBody = @{
-    email = "admin@monikamart.com"
-    password = "Admin@123"
+    email = "unauthorized@monikamart.com"
+    password = $env:ADMIN_PASSWORD
 }
 $fakeLoginResp = Invoke-WebRequest -Uri "$baseUrl/login" -Method Post -Body $fakeLoginBody -WebSession $fakeAdminSession -UseBasicParsing
 if ($fakeLoginResp.Content -match "Invalid email or password" -or $fakeLoginResp.Content -match "Unauthorized") {

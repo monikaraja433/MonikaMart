@@ -17,19 +17,19 @@
 
 <!-- Platform Metric Cards -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 36px;">
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 22px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">REGISTERED USERS</div>
         <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 6px;">${totalUsers}</div>
     </div>
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 22px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">CATALOG PRODUCTS</div>
         <div style="font-size: 2.2rem; font-weight: 800; color: var(--info); margin-top: 6px;">${totalProducts}</div>
     </div>
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 22px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">TOTAL ORDERS PLACED</div>
         <div style="font-size: 2.2rem; font-weight: 800; color: var(--warning); margin-top: 6px;">${totalOrders}</div>
     </div>
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 22px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">TOTAL PLATFORM REVENUE</div>
         <div style="font-size: 2.2rem; font-weight: 800; color: var(--success); margin-top: 6px;">₹<fmt:formatNumber value="${totalRevenue}" pattern="#,##0.00" /></div>
     </div>
@@ -44,7 +44,7 @@
         <span style="font-size: 0.85rem; color: var(--text-muted);">Audit log showing user/seller logins, registrations, product changes, orders, and reviews</span>
     </div>
 
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden;">
+    <div style="background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow);">
         <c:choose>
             <c:when test="${empty recentActivities}">
                 <div style="padding: 30px; text-align: center; color: var(--text-muted);">
@@ -52,10 +52,10 @@
                 </div>
             </c:when>
             <c:otherwise>
-                <div class="table-responsive">
+                <div class="table-responsive" style="border: none; box-shadow: none;">
                     <table class="table" style="margin-bottom: 0;">
                         <thead>
-                            <tr style="background: #f8fafc;">
+                            <tr>
                                 <th style="width: 130px;">Event</th>
                                 <th>Activity Description</th>
                                 <th style="width: 230px;">User / Initiator</th>
@@ -93,7 +93,7 @@
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
-                                    <td style="font-weight: 500; color: #1e293b;">
+                                    <td style="font-weight: 500; color: var(--text-primary);">
                                         <c:out value="${act.description}" />
                                     </td>
                                     <td>

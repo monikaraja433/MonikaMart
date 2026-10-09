@@ -10,9 +10,9 @@
     <div class="alert alert-danger"><c:out value="${errorMessage}" /></div>
 </c:if>
 
-<div style="display: grid; grid-template-columns: 3fr 2fr; gap: 32px; align-items: start;">
+<div class="layout-checkout">
     <!-- Shipping & Payment Form -->
-    <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 32px;">
+    <div class="surface-card" style="padding: 32px;">
         <form action="${pageContext.request.contextPath}/checkout/place" method="post">
             <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 16px;">1. Shipping Details</h3>
             
@@ -27,21 +27,21 @@
             </p>
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
-                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <label class="payment-option">
                     <input type="radio" name="paymentMethod" value="MOCK_UPI" checked>
                     <div>
                         <strong>Mock UPI / QR Pay</strong>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">Simulated Google Pay / PhonePe / Paytm</div>
                     </div>
                 </label>
-                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <label class="payment-option">
                     <input type="radio" name="paymentMethod" value="MOCK_CARD">
                     <div>
                         <strong>Mock Credit / Debit Card</strong>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">Simulated Visa / Mastercard / RuPay</div>
                     </div>
                 </label>
-                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <label class="payment-option">
                     <input type="radio" name="paymentMethod" value="MOCK_NETBANKING">
                     <div>
                         <strong>Mock Net Banking</strong>
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Review Items Summary -->
-    <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 24px;">
+    <div class="surface-card" style="padding: 24px;">
         <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Items in Order</h3>
         
         <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">

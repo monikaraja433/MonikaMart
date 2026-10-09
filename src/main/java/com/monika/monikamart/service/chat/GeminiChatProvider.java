@@ -33,8 +33,19 @@ public class GeminiChatProvider implements ChatProvider {
         "If a question is outside e-commerce or MonikaMart, politely steer the user back to shopping.";
 
     public GeminiChatProvider() {
-        this.apiKey = DBUtil.getProperty("ai.chatbot.gemini.key", "");
-        this.model = DBUtil.getProperty("ai.chatbot.gemini.model", "gemini-1.5-flash");
+        String envGeminiKey = System.getenv("GEMINI_API_KEY");
+        if (envGeminiKey != null && !envGeminiKey.trim().isEmpty()) {
+            this.apiKey = envGeminiKey.trim();
+        } else {
+            this.apiKey = DBUtil.getProperty("ai.chatbot.gemini.key", "");
+        }
+
+        String envGeminiModel = System.getenv("GEMINI_MODEL");
+        if (envGeminiModel != null && !envGeminiModel.trim().isEmpty()) {
+            this.model = envGeminiModel.trim();
+        } else {
+            this.model = DBUtil.getProperty("ai.chatbot.gemini.model", "gemini-1.5-flash");
+        }
         this.fallbackProvider = new MockChatProvider();
     }
 
@@ -96,7 +107,7 @@ public class GeminiChatProvider implements ChatProvider {
                 LOGGER.warning("Gemini API call returned status: " + responseCode + ". Using graceful fallback.");
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error calling Gemini API: " + e.getMessage() + ". Returning degraded fallback.");
+            LOGGER.log(Level.WARNING, "Error calling Gemini API (" + e.getClass().getSimpleName() + "). Returning degraded fallback.");
         }
 
         // Return graceful degraded response on network/API failure

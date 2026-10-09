@@ -168,12 +168,7 @@ public class DBUtil {
         String adminPassword = System.getenv("ADMIN_PASSWORD");
 
         try {
-            // 1. Remove old default admin account if different email
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE LOWER(email) = 'admin@monikamart.com'")) {
-                ps.executeUpdate();
-            }
-
-            // 2. Ensure NO other email has ADMIN role
+            // 1. Ensure NO other email has ADMIN role
             try (PreparedStatement ps = conn.prepareStatement("UPDATE users SET role = 'BUYER' WHERE role = 'ADMIN' AND LOWER(email) <> ?")) {
                 ps.setString(1, adminEmail);
                 ps.executeUpdate();

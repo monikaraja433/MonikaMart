@@ -21,7 +21,7 @@
 
 <c:choose>
     <c:when test="${empty orders}">
-        <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 50px; text-align: center;">
+        <div class="surface-card" style="padding: 50px; text-align: center;">
             <p style="color: var(--text-muted); font-size: 1.1rem;">No incoming customer orders yet.</p>
         </div>
     </c:when>

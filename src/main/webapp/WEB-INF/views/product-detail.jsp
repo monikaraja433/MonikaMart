@@ -4,11 +4,11 @@
 <c:set var="pageTitle" value="${product.name} - MonikaMart" />
 <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
-<div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 32px; margin-bottom: 32px;">
+<div class="surface-card" style="padding: 32px; margin-bottom: 32px;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; align-items: start;">
         
         <!-- Product Image -->
-        <div style="border-radius: var(--radius-md); overflow: hidden; background: #f8fafc; border: 1px solid var(--border-color); max-height: 420px; display: flex; align-items: center; justify-content: center;">
+        <div style="border-radius: var(--radius-md); overflow: hidden; background: var(--surface-alt); border: 1px solid var(--border-color); max-height: 420px; display: flex; align-items: center; justify-content: center;">
             <img src="<c:out value='${product.imageUrl}' />" alt="<c:out value='${product.name}' />" style="width: 100%; height: 100%; object-fit: contain; max-height: 400px;" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600'">
         </div>
 
@@ -40,7 +40,7 @@
                 ₹<fmt:formatNumber value="${product.price}" pattern="#,##0.00" />
             </div>
 
-            <div style="margin-bottom: 28px; line-height: 1.7; color: #334155;">
+            <div style="margin-bottom: 28px; line-height: 1.7; color: var(--text-primary);">
                 <c:out value="${product.description}" />
             </div>
 
@@ -62,7 +62,7 @@
 </div>
 
 <!-- Customer Reviews Section (Feature F8) -->
-<div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 32px;">
+<div class="surface-card" style="padding: 32px;">
     <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-bottom: 20px;">
         Customer Reviews &amp; Ratings
     </h3>
@@ -84,7 +84,7 @@
                                 </span>
                             </div>
                         </div>
-                        <p style="color: #475569; font-size: 0.95rem;"><c:out value="${rev.comment}" /></p>
+                        <p style="color: var(--text-primary); font-size: 0.95rem;"><c:out value="${rev.comment}" /></p>
                     </div>
                 </c:forEach>
             </div>

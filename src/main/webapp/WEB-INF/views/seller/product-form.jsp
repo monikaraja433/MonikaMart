@@ -24,7 +24,7 @@
             <c:if test="${not empty fieldErrors.name}"><div class="field-error"><c:out value="${fieldErrors.name}" /></div></c:if>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-row-2col">
             <div class="form-group">
                 <label class="form-label" for="category">Category *</label>
                 <input type="text" id="category" name="category" list="categoryOptions" class="form-control" required placeholder="e.g. Electronics" value="<c:out value='${product.category}' />">
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-row-2col">
             <div class="form-group">
                 <label class="form-label" for="stockQty">Stock Inventory Quantity *</label>
                 <input type="number" id="stockQty" name="stockQty" min="0" class="form-control" required placeholder="25" value="${product.stockQty != null ? product.stockQty : 10}">

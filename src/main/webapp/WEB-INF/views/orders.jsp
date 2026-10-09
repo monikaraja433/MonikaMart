@@ -8,7 +8,7 @@
 
 <c:choose>
     <c:when test="${empty orders}">
-        <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 50px 20px; text-align: center;">
+        <div class="surface-card" style="padding: 50px 20px; text-align: center;">
             <div style="font-size: 3rem; margin-bottom: 12px;">📦</div>
             <h2 style="font-size: 1.4rem; color: var(--dark); margin-bottom: 8px;">No orders found</h2>
             <p style="color: var(--text-muted); margin-bottom: 24px;">You haven't placed any orders on MonikaMart yet.</p>

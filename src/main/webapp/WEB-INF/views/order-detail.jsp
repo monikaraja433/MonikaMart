@@ -30,7 +30,7 @@
 </c:if>
 
 <!-- Order Status Workflow Stepper (Feature O2) -->
-<div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 28px; margin-bottom: 30px;">
+<div class="surface-card" style="padding: 28px; margin-bottom: 30px;">
     <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 20px;">Order Progress</h3>
     <div class="order-stepper">
         <div class="step-item ${order.status == 'PENDING' || order.status == 'CONFIRMED' || order.status == 'SHIPPED' || order.status == 'DELIVERED' ? 'completed' : ''}">
@@ -52,9 +52,9 @@
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start;">
+<div class="layout-2col-sidebar">
     <!-- Items Purchased -->
-    <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 24px;">
+    <div class="surface-card" style="padding: 24px;">
         <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Items Purchased</h3>
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
@@ -71,7 +71,7 @@
 
                         <!-- Review Submission Form for Delivered Items (Feature F8) -->
                         <c:if test="${order.status == 'DELIVERED' && sessionScope.user.role == 'BUYER'}">
-                            <div style="margin-top: 12px; padding: 12px; background: #f8fafc; border-radius: var(--radius-sm); border: 1px dashed var(--border-color);">
+                            <div style="margin-top: 12px; padding: 12px; background: var(--surface-alt); border-radius: var(--radius-sm); border: 1px dashed var(--border-strong);">
                                 <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">Leave a Verified Product Review:</span>
                                 <form action="${pageContext.request.contextPath}/reviews/add" method="post" style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
                                     <input type="hidden" name="orderId" value="${order.id}">
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Order Meta Card -->
-    <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 24px;">
+    <div class="surface-card" style="padding: 24px;">
         <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Delivery Details</h3>
         
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Shipping Address:</p>

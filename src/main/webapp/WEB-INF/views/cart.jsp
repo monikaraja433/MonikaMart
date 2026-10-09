@@ -17,7 +17,7 @@
 
 <c:choose>
     <c:when test="${empty cartItems}">
-        <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 50px 20px; text-align: center;">
+        <div class="surface-card" style="padding: 50px 20px; text-align: center;">
             <div style="font-size: 3rem; margin-bottom: 12px;">🛒</div>
             <h2 style="font-size: 1.4rem; color: var(--dark); margin-bottom: 8px;">Your cart is currently empty</h2>
             <p style="color: var(--text-muted); margin-bottom: 24px;">Explore our catalog and find high-quality products today.</p>
@@ -25,7 +25,7 @@
         </div>
     </c:when>
     <c:otherwise>
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start;">
+        <div class="layout-2col-sidebar">
             <!-- Cart Items Table -->
             <div class="table-responsive">
                 <table class="table">
@@ -78,7 +78,7 @@
             </div>
 
             <!-- Order Summary Card -->
-            <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 24px;">
+            <div class="surface-card" style="padding: 24px;">
                 <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 16px;">Order Summary</h3>
                 
                 <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--text-muted);">

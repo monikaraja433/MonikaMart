@@ -11,8 +11,15 @@ public class Main {
     public static void main(String[] args) throws Exception {
         int port = 8080;
         String portProp = System.getProperty("server.port");
+        if (portProp == null || portProp.trim().isEmpty()) {
+            portProp = System.getenv("PORT");
+        }
         if (portProp != null && !portProp.trim().isEmpty()) {
-            port = Integer.parseInt(portProp.trim());
+            try {
+                port = Integer.parseInt(portProp.trim());
+            } catch (NumberFormatException ignored) {
+                port = 8080;
+            }
         }
 
         Tomcat tomcat = new Tomcat();

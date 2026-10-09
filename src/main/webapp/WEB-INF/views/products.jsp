@@ -64,7 +64,7 @@
 
         <c:choose>
             <c:when test="${empty products}">
-                <div style="background: white; border-radius: var(--radius-md); padding: 48px; text-align: center; border: 1px solid var(--border-color);">
+                <div class="surface-card" style="padding: 48px; text-align: center;">
                     <p style="font-size: 1.2rem; color: var(--dark); margin-bottom: 8px;">No matching products found</p>
                     <p style="color: var(--text-muted); margin-bottom: 20px;">Try adjusting your keyword search or category filter.</p>
                     <a href="${pageContext.request.contextPath}/products" class="btn btn-secondary">Clear All Filters</a>

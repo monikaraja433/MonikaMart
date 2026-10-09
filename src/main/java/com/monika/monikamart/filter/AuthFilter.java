@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebFilter(filterName = "AuthFilter", urlPatterns = {"/seller/*", "/admin/*", "/cart/*", "/checkout/*", "/orders/*", "/wishlist/*", "/reviews/add"})
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/seller/*", "/admin/*", "/cart/*", "/checkout/*", "/orders/*", "/order-detail", "/wishlist/*", "/reviews/add"})
 public class AuthFilter implements Filter {
 
     @Override

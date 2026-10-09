@@ -6,6 +6,7 @@ import com.monika.monikamart.dao.impl.OrderDAOImpl;
 import com.monika.monikamart.dao.impl.ProductDAOImpl;
 import com.monika.monikamart.dao.impl.UserDAOImpl;
 import com.monika.monikamart.dto.UserResponseDTO;
+import com.monika.monikamart.exception.ResourceNotFoundException;
 import com.monika.monikamart.model.ActivityLog;
 import com.monika.monikamart.model.Order;
 import com.monika.monikamart.model.Product;
@@ -74,13 +75,28 @@ public class AdminServlet extends HttpServlet {
         String path = req.getServletPath();
 
         if ("/admin/moderate".equals(path)) {
-            int productId = Integer.parseInt(req.getParameter("productId"));
-            boolean active = Boolean.parseBoolean(req.getParameter("active"));
-            productService.moderateProductStatus(productId, active);
+            try {
+                int productId = Integer.parseInt(req.getParameter("productId"));
+                boolean active = Boolean.parseBoolean(req.getParameter("active"));
+                productService.getProductById(productId);
+                boolean updated = productService.moderateProductStatus(productId, active);
+                if (!updated) {
+                    throw new ResourceNotFoundException("Product not found with ID: " + productId);
+                }
 
-            activityService.logActivity("PRODUCT_MODERATED", "Product listing status updated for ID #" + productId + " (Active: " + active + ") by Admin", "monikaraja433@gmail.com");
-            req.getSession().setAttribute("flashSuccess", "Listing moderation status updated successfully!");
-            resp.sendRedirect(req.getContextPath() + "/admin/listings?success=StatusUpdated");
+                activityService.logActivity("PRODUCT_MODERATED", "Product listing status updated for ID #" + productId + " (Active: " + active + ") by Admin", "monikaraja433@gmail.com");
+                req.getSession().setAttribute("flashSuccess", "Listing moderation status updated successfully!");
+                resp.sendRedirect(req.getContextPath() + "/admin/listings?success=StatusUpdated");
+            } catch (NumberFormatException e) {
+                req.getSession().setAttribute("flashError", "Invalid product ID specified for moderation.");
+                resp.sendRedirect(req.getContextPath() + "/admin/listings");
+            } catch (ResourceNotFoundException e) {
+                req.getSession().setAttribute("flashError", "Requested product was not found.");
+                resp.sendRedirect(req.getContextPath() + "/admin/listings");
+            } catch (Exception e) {
+                req.getSession().setAttribute("flashError", "Failed to update listing moderation status.");
+                resp.sendRedirect(req.getContextPath() + "/admin/listings");
+            }
         }
     }
 }

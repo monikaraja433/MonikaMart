@@ -24,15 +24,15 @@
 
 <!-- Metrics Overview Cards (Feature O3 / Week 4) -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 32px;">
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 20px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ACTIVE LISTINGS</div>
         <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 6px;">${productCount}</div>
     </div>
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 20px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">TOTAL ORDERS</div>
         <div style="font-size: 2rem; font-weight: 800; color: var(--info); margin-top: 6px;">${orderCount}</div>
     </div>
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 20px;">
+    <div class="metric-card">
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">GROSS SALES REVENUE</div>
         <div style="font-size: 2rem; font-weight: 800; color: var(--success); margin-top: 6px;">₹<fmt:formatNumber value="${totalSales}" pattern="#,##0.00" /></div>
     </div>
@@ -43,7 +43,7 @@
 
 <c:choose>
     <c:when test="${empty products}">
-        <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 40px; text-align: center;">
+        <div class="surface-card" style="padding: 40px; text-align: center;">
             <p style="color: var(--text-muted); margin-bottom: 16px;">You haven't listed any products yet.</p>
             <a href="${pageContext.request.contextPath}/seller/product-form" class="btn btn-primary">+ Create Your First Listing</a>
         </div>

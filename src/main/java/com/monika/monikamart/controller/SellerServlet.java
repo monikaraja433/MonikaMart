@@ -6,8 +6,11 @@ import com.monika.monikamart.dao.impl.OrderDAOImpl;
 import com.monika.monikamart.dao.impl.ProductDAOImpl;
 import com.monika.monikamart.dto.ProductDTO;
 import com.monika.monikamart.dto.UserResponseDTO;
+import com.monika.monikamart.exception.ResourceNotFoundException;
+import com.monika.monikamart.exception.UnauthorizedException;
 import com.monika.monikamart.exception.ValidationException;
 import com.monika.monikamart.model.Order;
+import com.monika.monikamart.model.OrderItem;
 import com.monika.monikamart.model.OrderStatus;
 import com.monika.monikamart.model.Product;
 import com.monika.monikamart.service.ActivityService;
@@ -53,14 +56,18 @@ public class SellerServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         UserResponseDTO seller = (UserResponseDTO) session.getAttribute("user");
 
-        if ("/seller/dashboard".equals(path)) {
+        if ("/seller/dashboard".equals(path) || "/seller/products".equals(path)) {
             List<Product> products = productService.getProductsBySeller(seller.getId());
             List<Order> orders = orderService.getOrdersForSeller(seller.getId());
 
             BigDecimal totalSales = BigDecimal.ZERO;
             for (Order o : orders) {
-                if (o.getStatus() != OrderStatus.CANCELLED) {
-                    totalSales = totalSales.add(o.getTotalAmount());
+                if (o.getStatus() != OrderStatus.CANCELLED && o.getItems() != null) {
+                    for (OrderItem item : o.getItems()) {
+                        if (item.getSellerId() == seller.getId()) {
+                            totalSales = totalSales.add(item.getSubtotal());
+                        }
+                    }
                 }
             }
 
@@ -71,16 +78,27 @@ public class SellerServlet extends HttpServlet {
             req.setAttribute("totalSales", totalSales);
 
             req.getRequestDispatcher("/WEB-INF/views/seller/dashboard.jsp").forward(req, resp);
-        } else if ("/seller/products".equals(path)) {
-            List<Product> products = productService.getProductsBySeller(seller.getId());
-            req.setAttribute("products", products);
-            req.getRequestDispatcher("/WEB-INF/views/seller/dashboard.jsp").forward(req, resp);
         } else if ("/seller/product-form".equals(path)) {
             String idStr = req.getParameter("id");
             if (idStr != null && !idStr.trim().isEmpty()) {
-                int id = Integer.parseInt(idStr);
-                Product product = productService.getProductById(id);
-                req.setAttribute("product", product);
+                try {
+                    int id = Integer.parseInt(idStr.trim());
+                    Product product = productService.getProductById(id);
+                    if (product.getSellerId() != seller.getId()) {
+                        session.setAttribute("flashError", "You are not authorized to edit this product.");
+                        resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
+                        return;
+                    }
+                    req.setAttribute("product", product);
+                } catch (NumberFormatException e) {
+                    session.setAttribute("flashError", "Invalid product ID specified.");
+                    resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
+                    return;
+                } catch (ResourceNotFoundException e) {
+                    session.setAttribute("flashError", "Requested product was not found.");
+                    resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
+                    return;
+                }
             }
             req.setAttribute("categories", productService.getAllCategories());
             req.getRequestDispatcher("/WEB-INF/views/seller/product-form.jsp").forward(req, resp);
@@ -108,7 +126,13 @@ public class SellerServlet extends HttpServlet {
 
             ProductDTO dto = new ProductDTO();
             if (idStr != null && !idStr.trim().isEmpty()) {
-                dto.setId(Integer.parseInt(idStr));
+                try {
+                    dto.setId(Integer.parseInt(idStr.trim()));
+                } catch (NumberFormatException e) {
+                    session.setAttribute("flashError", "Invalid product ID specified.");
+                    resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
+                    return;
+                }
             }
             dto.setName(name);
             dto.setDescription(description);
@@ -122,7 +146,7 @@ public class SellerServlet extends HttpServlet {
             try {
                 if (dto.getId() != null) {
                     Product updated = productService.updateProduct(dto, seller.getId());
-                    activityService.logActivity("PRODUCT_UPDATED", "Product updated: '" + dto.getName() + "' (ID: #" + dto.getId() + ") by " + seller.getName() + " (" + seller.getEmail() + ")", seller.getEmail());
+                    activityService.logActivity("PRODUCT_UPDATED", "Product updated: '" + updated.getName() + "' (ID: #" + dto.getId() + ") by " + seller.getName() + " (" + seller.getEmail() + ")", seller.getEmail());
                     session.setAttribute("flashSuccess", "Product updated successfully!");
                 } else {
                     Product created = productService.createProduct(dto, seller.getId());
@@ -136,32 +160,44 @@ public class SellerServlet extends HttpServlet {
                 req.setAttribute("product", dto);
                 req.setAttribute("categories", productService.getAllCategories());
                 req.getRequestDispatcher("/WEB-INF/views/seller/product-form.jsp").forward(req, resp);
+            } catch (ResourceNotFoundException | UnauthorizedException e) {
+                session.setAttribute("flashError", e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
             }
         } else if ("/seller/product-delete".equals(path)) {
-            int productId = Integer.parseInt(req.getParameter("productId"));
             try {
+                int productId = Integer.parseInt(req.getParameter("productId"));
                 productService.deleteProduct(productId, seller.getId());
                 activityService.logActivity("PRODUCT_DELETED", "Product deleted: ID #" + productId + " by " + seller.getName() + " (" + seller.getEmail() + ")", seller.getEmail());
                 session.setAttribute("flashSuccess", "Product deleted successfully!");
                 resp.sendRedirect(req.getContextPath() + "/seller/dashboard?success=ProductDeleted");
+            } catch (NumberFormatException e) {
+                session.setAttribute("flashError", "Invalid product ID specified.");
+                resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
+            } catch (ResourceNotFoundException | UnauthorizedException e) {
+                session.setAttribute("flashError", e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
             } catch (Exception e) {
                 session.setAttribute("flashError", "Failed to delete product: " + e.getMessage());
                 resp.sendRedirect(req.getContextPath() + "/seller/dashboard");
             }
         } else if ("/seller/status-update".equals(path)) {
-            int orderId = Integer.parseInt(req.getParameter("orderId"));
-            String statusStr = req.getParameter("newStatus");
-            String notes = req.getParameter("notes");
-            OrderStatus newStatus = OrderStatus.fromString(statusStr);
-
             try {
+                int orderId = Integer.parseInt(req.getParameter("orderId"));
+                String statusStr = req.getParameter("newStatus");
+                String notes = req.getParameter("notes");
+                OrderStatus newStatus = OrderStatus.fromString(statusStr);
+
                 orderService.updateOrderStatus(orderId, newStatus, notes, seller.getId(), seller.getRole());
                 activityService.logActivity("ORDER_STATUS", "Order #MKM-" + orderId + " status updated to " + newStatus + " by " + seller.getEmail(), seller.getEmail());
                 session.setAttribute("flashSuccess", "Order status updated successfully!");
                 resp.sendRedirect(req.getContextPath() + "/seller/orders?success=StatusUpdated");
-            } catch (ValidationException e) {
+            } catch (NumberFormatException e) {
+                session.setAttribute("flashError", "Invalid order ID specified.");
+                resp.sendRedirect(req.getContextPath() + "/seller/orders");
+            } catch (ValidationException | ResourceNotFoundException | UnauthorizedException e) {
                 session.setAttribute("flashError", e.getMessage());
-                resp.sendRedirect(req.getContextPath() + "/seller/orders?error=" + e.getMessage());
+                resp.sendRedirect(req.getContextPath() + "/seller/orders");
             } catch (Exception e) {
                 session.setAttribute("flashError", "Failed to update order status: " + e.getMessage());
                 resp.sendRedirect(req.getContextPath() + "/seller/orders?error=StatusUpdateFailed");
